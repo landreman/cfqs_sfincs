@@ -1,0 +1,108 @@
+! Input file for SFINCS version 3.
+! See the user manual for documentation of the parameters in this file.
+!----------------------------------------------------------------------
+
+!ss scanType = 5
+
+!ss profilesScheme = 2
+!ss Nradius = 39
+!ss rN_min = 0.025
+!ss rN_max = 0.975
+
+! !ss Nradius = 9
+! !ss rN_min = 0.1
+! !ss rN_max = 0.9
+
+! !ss Nradius = 12
+! !ss rN_min = 0.025
+! !ss rN_max = 0.3
+
+! Parameters specific to scanType = 2:
+!ss NErs = 5
+!ss ErMin = -4.0d+0
+!ss ErMax =  4.0d+0
+
+! Parameters specific to scanType = 3:
+!ss scanVariable = preconditioner_x_min_L
+!ss scanVariableMin = 0
+!ss scanVariableMax = 2
+!ss scanVariableN = 3
+!ss scanVariableScale = linear
+
+&general
+! solveSystem = F
+/
+
+&geometryParameters
+  geometryScheme = 5
+  VMECRadialOption = 0
+
+  inputRadialCoordinate = 3  ! rN
+  rN_wish = 0.2
+
+  equilibriumFile = "/ptmp/mlan/20201204-01-SFINCS_CFQS/wout_2b40.nc"
+/
+
+&speciesParameters
+  Zs = 1 -1
+  mHats = 1 0.000545509d+0
+  nHats = 0.0969984 0.0969984 ! Set by sfincsScan_4.
+  dnHatdrHats = -0.12239912394462713 -0.12239912394462713 ! Set by sfincsScan_4.
+  THats = 2.4912 3.3216 ! Set by sfincsScan_4.
+  dTHatdrHats = -4.516861869117 -6.022482492156 ! Set by sfincsScan_4.
+/
+
+&physicsParameters
+  Delta = 4.5694d-3
+  alpha = 1d+0
+  nu_n = 0.00831565d+0
+
+  Er = -1
+
+  collisionOperator = 0
+  includeXDotTerm = .true.
+  includeElectricFieldTermInXiDot = .true.
+  useDKESExBDrift = .false.
+
+  includePhi1 = .false.
+/
+
+&resolutionParameters
+  Ntheta = 45
+!ss NthetaMinFactor = 0.7
+!ss NthetaMaxFactor = 2
+!ss NthetaNumRuns = 5
+
+  Nzeta = 79
+!ss NzetaMinFactor = 0.8
+!ss NzetaMaxFactor = 2
+!ss NzetaNumRuns = 5
+
+  Nxi = 250
+!ss NxiMinFactor = 0.8
+!ss NxiMaxFactor = 2
+!ss NxiNumRuns = 6
+  
+  Nx = 7
+!ss NxMinFactor = 0.8
+!ss NxMaxFactor = 2
+!ss NxNumRuns = 3
+
+  solverTolerance = 1d-6
+!ss solverToleranceMinFactor = 0.1
+!ss solverToleranceMaxFactor = 10
+!ss solverToleranceNumRuns = 3
+/
+
+&otherNumericalParameters
+/
+
+&preconditionerOptions
+!  preconditioner_species = 1
+!  preconditioner_x = 1
+!  preconditioner_x_min_L = 0
+!  preconditioner_xi = 0
+/
+
+&export_f
+/
