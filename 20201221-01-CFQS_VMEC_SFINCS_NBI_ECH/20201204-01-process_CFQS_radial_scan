@@ -1,0 +1,263 @@
+#!/usr/bin/env python
+
+min_rN = 0.0
+max_rN = 0.95
+
+Nspecies = 2
+
+import matplotlib
+import sys
+
+makePDF = False
+for whichFile in range(1,len(sys.argv)):
+    if sys.argv[whichFile]=='pdf':
+        makePDF = True
+
+if makePDF:
+    matplotlib.use('PDF')
+    # Change default font size
+    #font = {'size':6}
+    #matplotlib.rc('font', **font)
+    #matplotlib.rc('lines',markeredgewidth=0,markersize=3,linewidth=0.5)
+    #matplotlib.rc('axes',linewidth=0.7)
+
+
+import matplotlib.pyplot as plt
+import numpy as np
+import inspect, os, pickle
+from scipy.io import netcdf
+import string
+
+#if len(sys.argv) != 1:
+#    print "Error! You must specify 1 or more arguments: the answers_plot.XXX file(s)."
+#    exit(1)
+
+matplotlib.rcParams.update({'font.size': 10})
+
+if makePDF:
+    fig = plt.figure(figsize=(11,8.5))
+else:
+    fig = plt.figure(figsize=(11,8.5))
+
+fig.patch.set_facecolor('white')
+
+
+
+numPlots = Nspecies*5+2
+# For each species, plot n, T, V, Gamma, q.
+# Also plot ambipolar Er & J_bs
+numCols = np.ceil(np.sqrt(numPlots))
+numRows = np.ceil(numPlots/numCols)
+
+factor = 437695 * 1e20 * 1.602177e-19 / (1e6)
+sfincsLinewidth=1.7
+mycolor='r'
+
+[head,extension] = os.path.split(os.getcwd())
+f = open(extension+".sfincsResults",'w')
+f.write('r/a=sqrt(s), Root type')
+# For future use, in case I want to plot multiple scans on the same axes:
+for whichDirectory in [1]:
+
+    inputFile = open('sfincsScan.dat','rb')
+    data=pickle.load(inputFile)
+    inputFile.close()
+
+    dataToSave = []
+    for whichPlot in range(Nspecies*5+2):
+        f.write(', ')
+
+        if whichPlot<2*Nspecies:
+            linespec='.-'
+        else:
+            linespec='.'
+
+        #index = 10
+        #desiredLabel='FSABjHat'
+        #if data['ylabels'][index] != desiredLabel:
+        #    print "Error! At the index where I expected "+desiredLabel+", I instead found ",data['ylabels'][index]
+        rN = np.array(data['xdata'][whichPlot])
+        root_types = np.array(data['root_types'])
+        #FSABjHat = np.array(data['ydata'][index]) * factor
+        #ylabel = data['ylabel'][whichPlot]
+        if whichPlot==0:
+            label = 'Density (H) [m^-3]'
+            factor = 1e20
+            shouldBe = 'nHat, species 1'
+            mymax = None
+            mymin = 0
+        elif whichPlot==1:
+            label = 'Density (e) [m^-3]'
+            factor = 1e20
+            shouldBe = 'nHat, species 2'
+            mymax = None
+            mymin = 0
+        elif whichPlot==2:
+            label = 'Temperature (H) [keV]'
+            factor = 1
+            shouldBe = 'THat, species 1'
+            mymax = None
+            mymin = 0
+        elif whichPlot==3:
+            label = 'Temperature (e) [keV]'
+            factor = 1
+            shouldBe = 'THat, species 2'
+            mymax = None
+            mymin = 0
+        elif whichPlot==4:
+            label = 'Ambipolar Er [kV/m]'
+            factor = 1
+            shouldBe = 'Ambipolar Er'
+            mymax = None
+            mymin = None
+        elif whichPlot==5:
+            label = '<V dot B> (H) [T km / s]'
+            nHat = np.array(data['ydata'][0])
+            factor = 437695 / nHat / 1000
+            shouldBe = 'FSABFlow'
+            mymax = None
+            mymin = None
+        elif whichPlot==6:
+            #label = 'Particle flux (e)\n[s^-1 m^-2]'
+            #factor = (1e20)*(437695) # nBar * vBar, so radial flux now has units of 1 /(s*m^2)
+            label = 'Particle flux (H) [10$^{20}$s$^{-1}$ m$^{-2}$]'
+            factor = (1e20)*(437695)/(1e20) # nBar * vBar / (1e20), so radial flux now has units of (1e20) /(s*m^2)
+            shouldBe = 'particleFlux'
+            mymax = None
+            mymin = 0
+        elif whichPlot==7:
+            label = 'Heat flux (H) [kW / m^2]'
+            factor = (1e20)*(1.6726e-27)*(437695 ** 3)/(1e3) # * nBar * mBar * vBar^3 / RBar / 1e6, so units become MW/(m^2)
+            shouldBe = 'heatFlux'
+            mymax = None
+            mymin = 0
+        elif whichPlot==8:
+            label = '<V dot B> (e) [T km / s]'
+            nHat = np.array(data['ydata'][1])
+            factor = 437695 / nHat / 1000
+            shouldBe = 'FSABFlow'
+            mymax = None
+            mymin = None
+        elif whichPlot==9:
+            #label = 'Particle flux (H)\n[s^-1 m^-2]'
+            #factor=(1e20)*(437695) # nBar * vBar, so radial flux now has units of 1 /(s*m^2)
+            label = 'Particle flux (e) [10$^{20}$s$^{-1}$ m$^{-2}$]'
+            factor=(1e20)*(437695)/(1e20) # nBar * vBar, so radial flux now has units of (1e20) /(s*m^2)
+            shouldBe = 'particleFlux'
+            mymax = None
+            mymin = 0
+        elif whichPlot==10:
+            label = 'Heat flux (e) [kW / m^2]'
+            factor = (1e20)*(1.6726e-27)*(437695 ** 3)/(1e3) # * nBar * mBar * vBar^3 / RBar / 1e6, so units become MW/(m^2)
+            shouldBe = 'heatFlux'
+            mymax = None
+            mymin = 0
+        elif whichPlot==11:
+            label = '<J dot B> [kA T / m^2]'
+            factor = 437695 * 1e20 * 1.602177e-19 / (1e3)
+            shouldBe = 'FSABjHat'
+            mymax = 0
+            mymin = None
+
+        f.write(string.replace(label,'\n',' '))
+        ydata = np.array(data['ydata'][whichPlot]) * factor
+
+        print "len(rN) before:", len(rN)
+        mask = np.logical_and(rN >= min_rN, rN <= max_rN)
+        print "len(mask):", len(mask)
+        #rN = np.insert(rN[mask],0,[0])
+        #ydata = np.insert(ydata[mask],0,[0])
+        rN = rN[mask]
+        print "len(rN) after:", len(rN)
+        ydata = ydata[mask]
+        print "len(root_types):", len(root_types)
+        root_types = root_types[mask]
+
+        plt.subplot(numRows,numCols,whichPlot+1)
+        #plt.plot(rN, ydata,linespec,linewidth=sfincsLinewidth,color=mycolor)
+        if whichPlot < 2*Nspecies:
+            # Density and temperature
+            linespec='.-'
+            plt.plot(rN,ydata,linespec)
+        else:
+            linespec='.'
+            x = rN
+            y = ydata
+            mask = np.array([t=='ion' for t in root_types])
+            if len(x[mask]) > 0: 
+                plt.plot(x[mask],y[mask],linespec,color='r',label='ion root')
+            mask = np.array([t=='unstable' for t in root_types])
+            if len(x[mask]) > 0: 
+                plt.plot(x[mask],y[mask],linespec,color='g',label='unstable root')
+            mask = np.array([t=='electron' for t in root_types])
+            if len(x[mask]) > 0: 
+                plt.plot(x[mask],y[mask],linespec,color='b',label='electron root')
+            mask = np.array([t=='unknown' for t in root_types])
+            if len(x[mask]) > 0: 
+                plt.plot(x[mask],y[mask],linespec,color='orange',label='unknown root')
+        if whichPlot==2*Nspecies:
+            # Plot of Er
+            plt.legend(loc=0,fontsize=6)
+            
+        plt.xlim([0,1])
+        plt.ylim([mymin, mymax])
+        plt.plot([0,1],[0,0],':k')
+        plt.xlabel('r/a=sqrt(s)')
+        plt.title(label,fontsize=10)
+
+        # Add a row of zeros:
+        #rN = np.insert(rN,0,[0])
+        #ydata = np.insert(ydata,0,[0])
+
+        if whichPlot==0:
+            dataToSave.append(rN)
+            dataToSave.append(root_types)
+        dataToSave.append(ydata)
+
+        oldLabel = data['ylabels'][whichPlot]
+        if oldLabel.find(shouldBe) != 0:
+            print "ERROR!!! I was expecting to find "+shouldBe+" but instead found "+oldLabel
+            print "whichPlot=",whichPlot
+            exit(1)
+
+f.write('\n')
+for i in range(len(rN)):
+    for j in range(len(dataToSave)):
+        if j>0:
+            f.write(', ')
+        #print "i=", i, " j=", j, ' len(dataToSave[j]=', len(dataToSave[j])
+        data_to_write = dataToSave[j][i]
+        if isinstance(data_to_write, str):
+            # Root type is a string
+            f.write('{:10}'.format('"' + data_to_write + '"'))
+        else:
+            f.write('{:20.14g}'.format(data_to_write))
+    f.write('\n')
+f.close()
+
+plt.subplots_adjust(left=0.07,bottom=0.1,right=0.98,top=0.93,wspace=0.32,hspace=0.50)
+#plt.ylabel('- <j dot B> [MA T / m^2]')
+#plt.legend(loc=0,fontsize=11)
+#plt.subplots_adjust(left=0.08,bottom=0.14,right=0.97,top=0.90)
+#plt.ylim([0,10])
+#plt.plot([0,1],[0,0],':k')
+#plt.title('Bootstrap current density for fixed p(r), varying collisionality.\nA=6 pilot plant, free-boundary equilibrium (ns=199), straight-outer-leg coils.')
+
+#titleString = "Plot generated by "+ inspect.getfile(inspect.currentframe()) + "\nRun in "+os.getcwd()
+#titleString = "Plotting data in "+os.path.abspath(filename)
+#(head,tail) = os.path.split(os.path.abspath(filename))
+#titleString = "Plotting data file "+tail+"\nIn "+head
+#plt.figtext(0.5,0.99,titleString,horizontalalignment='center',verticalalignment='top')
+titleString = "Plot generated by "+ os.path.abspath(inspect.getfile(inspect.currentframe()))
+plt.figtext(0.5,0.01,titleString,horizontalalignment='center',verticalalignment='bottom',fontsize=8)
+
+titleString = "Scan directory "+ os.getcwd()
+plt.figtext(0.5,0.99,titleString,horizontalalignment='center',verticalalignment='top',fontsize=8)
+
+if makePDF:
+    print "Saving PDF"
+    plt.savefig(os.path.basename(__file__) + ".pdf", orientation = 'landscape', papertype='letter')
+    plt.savefig(extension + ".pdf", orientation = 'landscape', papertype='letter')
+else:
+    plt.show()
+

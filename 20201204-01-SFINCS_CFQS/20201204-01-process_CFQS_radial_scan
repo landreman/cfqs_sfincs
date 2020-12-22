@@ -81,25 +81,25 @@ for whichDirectory in [1]:
         #FSABjHat = np.array(data['ydata'][index]) * factor
         #ylabel = data['ylabel'][whichPlot]
         if whichPlot==0:
-            label = 'Density (e) [m^-3]'
+            label = 'Density (H) [m^-3]'
             factor = 1e20
             shouldBe = 'nHat, species 1'
             mymax = None
             mymin = 0
         elif whichPlot==1:
-            label = 'Density (H) [m^-3]'
+            label = 'Density (e) [m^-3]'
             factor = 1e20
             shouldBe = 'nHat, species 2'
             mymax = None
             mymin = 0
         elif whichPlot==2:
-            label = 'Temperature (e) [keV]'
+            label = 'Temperature (H) [keV]'
             factor = 1
             shouldBe = 'THat, species 1'
             mymax = None
             mymin = 0
         elif whichPlot==3:
-            label = 'Temperature (H) [keV]'
+            label = 'Temperature (e) [keV]'
             factor = 1
             shouldBe = 'THat, species 2'
             mymax = None
@@ -111,7 +111,7 @@ for whichDirectory in [1]:
             mymax = None
             mymin = None
         elif whichPlot==5:
-            label = '<V dot B> (e) [T km / s]'
+            label = '<V dot B> (H) [T km / s]'
             nHat = np.array(data['ydata'][0])
             factor = 437695 / nHat / 1000
             shouldBe = 'FSABFlow'
@@ -120,19 +120,19 @@ for whichDirectory in [1]:
         elif whichPlot==6:
             #label = 'Particle flux (e)\n[s^-1 m^-2]'
             #factor = (1e20)*(437695) # nBar * vBar, so radial flux now has units of 1 /(s*m^2)
-            label = 'Particle flux (e) [10$^{20}$s$^{-1}$ m$^{-2}$]'
+            label = 'Particle flux (H) [10$^{20}$s$^{-1}$ m$^{-2}$]'
             factor = (1e20)*(437695)/(1e20) # nBar * vBar / (1e20), so radial flux now has units of (1e20) /(s*m^2)
             shouldBe = 'particleFlux'
             mymax = None
             mymin = 0
         elif whichPlot==7:
-            label = 'Heat flux (e) [kW / m^2]'
+            label = 'Heat flux (H) [kW / m^2]'
             factor = (1e20)*(1.6726e-27)*(437695 ** 3)/(1e3) # * nBar * mBar * vBar^3 / RBar / 1e6, so units become MW/(m^2)
             shouldBe = 'heatFlux'
             mymax = None
             mymin = 0
         elif whichPlot==8:
-            label = '<V dot B> (H) [T km / s]'
+            label = '<V dot B> (e) [T km / s]'
             nHat = np.array(data['ydata'][1])
             factor = 437695 / nHat / 1000
             shouldBe = 'FSABFlow'
@@ -141,13 +141,13 @@ for whichDirectory in [1]:
         elif whichPlot==9:
             #label = 'Particle flux (H)\n[s^-1 m^-2]'
             #factor=(1e20)*(437695) # nBar * vBar, so radial flux now has units of 1 /(s*m^2)
-            label = 'Particle flux (H) [10$^{20}$s$^{-1}$ m$^{-2}$]'
+            label = 'Particle flux (e) [10$^{20}$s$^{-1}$ m$^{-2}$]'
             factor=(1e20)*(437695)/(1e20) # nBar * vBar, so radial flux now has units of (1e20) /(s*m^2)
             shouldBe = 'particleFlux'
             mymax = None
             mymin = 0
         elif whichPlot==10:
-            label = 'Heat flux (H) [kW / m^2]'
+            label = 'Heat flux (e) [kW / m^2]'
             factor = (1e20)*(1.6726e-27)*(437695 ** 3)/(1e3) # * nBar * mBar * vBar^3 / RBar / 1e6, so units become MW/(m^2)
             shouldBe = 'heatFlux'
             mymax = None
@@ -184,11 +184,14 @@ for whichDirectory in [1]:
             x = rN
             y = ydata
             mask = np.array([t=='ion' for t in root_types])
-            plt.plot(x[mask],y[mask],linespec,color='r',label='ion root')
+            if len(x[mask]) > 0: 
+                plt.plot(x[mask],y[mask],linespec,color='r',label='ion root')
             mask = np.array([t=='unstable' for t in root_types])
-            plt.plot(x[mask],y[mask],linespec,color='g',label='unstable root')
+            if len(x[mask]) > 0: 
+                plt.plot(x[mask],y[mask],linespec,color='g',label='unstable root')
             mask = np.array([t=='electron' for t in root_types])
-            plt.plot(x[mask],y[mask],linespec,color='b',label='electron root')
+            if len(x[mask]) > 0: 
+                plt.plot(x[mask],y[mask],linespec,color='b',label='electron root')
             mask = np.array([t=='unknown' for t in root_types])
             if len(x[mask]) > 0: 
                 plt.plot(x[mask],y[mask],linespec,color='orange',label='unknown root')
