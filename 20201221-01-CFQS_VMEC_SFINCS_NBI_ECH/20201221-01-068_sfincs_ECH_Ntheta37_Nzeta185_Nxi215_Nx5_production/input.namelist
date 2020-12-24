@@ -1,0 +1,104 @@
+! Input file for SFINCS version 3.
+! See the user manual for documentation of the parameters in this file.
+!----------------------------------------------------------------------
+
+!ss scanType = 5
+
+!ss profilesScheme = 2
+!ss Nradius = 39
+!ss rN_min = 0.025
+!ss rN_max = 0.975
+
+! Parameters specific to scanType = 2:
+!ss NErs = 5
+!ss ErMin = -4.0d+0
+!ss ErMax =  4.0d+0
+
+! Parameters specific to scanType = 3:
+!ss scanVariable = preconditioner_x_min_L
+!ss scanVariableMin = 0
+!ss scanVariableMax = 2
+!ss scanVariableN = 3
+!ss scanVariableScale = linear
+
+&general
+!solveSystem = F
+/
+
+&geometryParameters
+  rN_wish = 0.2 ! Set by sfincsScan_4.
+  geometryScheme = 5
+  VMECRadialOption = 0
+
+  inputRadialCoordinate = 3  ! rN
+
+!  inputRadialCoordinate = 1 ! psiN
+!  psiN_wish = 0.2
+
+!  equilibriumFile = "/ptmp/mlan/20201204-01-SFINCS_CFQS/wout_2b40.nc"
+  equilibriumFile = "/ptmp/mlan/20201221-01-CFQS_VMEC_SFINCS_NBI_ECH/20201221-01-020-vmec_fullBeta_NR192_NZ256_NPHI64_mpol12_ntor12_ns401/wout_2b40_freeBoundary.nc"
+/
+
+&speciesParameters
+  nHats = 0.0969984 0.0969984 ! Set by sfincsScan_4.
+  dnHatdrHats = -0.1223331615464711 -0.1223331615464711 ! Set by sfincsScan_4.
+  THats = 0.36 1.44 ! Set by sfincsScan_4.
+  dTHatdrHats = -0.6523739416940653 -2.609495766776261 ! Set by sfincsScan_4.
+  Zs = 1 -1
+  mHats = 1 0.000545509d+0
+/
+
+&physicsParameters
+  Delta = 4.5694d-3
+  alpha = 1d+0
+  nu_n = 0.00831565d+0
+
+  Er = -2.6
+
+  collisionOperator = 0
+  includeXDotTerm = .true.
+  includeElectricFieldTermInXiDot = .true.
+  useDKESExBDrift = .false.
+
+  includePhi1 = .false.
+/
+
+&resolutionParameters
+  Ntheta = 37
+!ss NthetaMinFactor = 1
+!ss NthetaMaxFactor = 1.5
+!ss NthetaNumRuns = 12
+
+  Nzeta = 185
+!ss NzetaMinFactor = 1
+!ss NzetaMaxFactor = 2
+!ss NzetaNumRuns = 12
+
+  Nxi = 215
+!ss NxiMinFactor = 1.0
+!ss NxiMaxFactor = 1.5
+!ss NxiNumRuns = 12
+  
+  Nx = 5
+!ss NxMinFactor = 0.8
+!ss NxMaxFactor = 2
+!ss NxNumRuns = 0
+
+  solverTolerance = 3d-6
+!ss solverToleranceMinFactor = 0.1
+!ss solverToleranceMaxFactor = 10
+!ss solverToleranceNumRuns = 0
+/
+
+&otherNumericalParameters
+/
+
+&preconditionerOptions
+!  preconditioner_species = 1
+!  preconditioner_x = 1
+!  preconditioner_x_min_L = 0
+!  preconditioner_xi = 0
+/
+
+&export_f
+/
